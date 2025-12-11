@@ -1503,6 +1503,17 @@
                 updatePersona();
             }
         });
+
+                // Ensure send button works (backup event listener)
+        document.addEventListener('DOMContentLoaded', function() {
+            const sendBtn = document.getElementById('sendBtn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sendMessage();
+                });
+            }
+        });
     </script>
 </body>
 </html>
