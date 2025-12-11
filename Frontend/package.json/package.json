@@ -4,6 +4,8 @@
   "description": "DonMentor - Progressive Web App",
   "private": true,
   "scripts": {
-    "dev": "python -m http.server 8000"
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Static site - no build needed'",
+    "start": "echo 'Static site deployed'"
   }
 }
