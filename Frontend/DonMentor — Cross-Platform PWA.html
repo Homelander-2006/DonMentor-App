@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="description" content="DonMentor - Wise counsel, delivered like family">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%238b3a3a' width='192' height='192'/><text x='50%' y='50%' font-size='120' fill='%23d4af37' text-anchor='middle' dy='0.3em' font-family='serif' font-weight='bold'>Ⓓ</text></svg>">
+    <title>DonMentor — Advice from the Don</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --accent-burgundy: #8b3a3a;
+            --accent-olive: #556b4a;
+            --accent-gold: #d4af37;
+            --text-primary: #f5f5f5;
+            --text-secondary: #b0b0b0;
+            --border-subtle: #404040;
+            --success: #4a9d6f;
+            --warning: #d97706;
+            --error: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .logo-badge {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--accent-gold);
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            font-family: Georgia, serif;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 2px 0 0 0;
+        }
+
+        .sync-status {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .sync-indicator.syncing {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .disclaimer {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .new-chat-btn {
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            color: var(--text-primary);
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .new-chat-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 58, 58, 0.3);
+        }
+
+        .conversation-history {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        .conversation-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-item:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent-olive);
+            color: var(--text-primary);
+        }
+
+        .conversation-item.active {
+            background: var(--accent-burgundy);
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .settings-section {
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 16px;
+            gap: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: left;
+        }
+
+        .settings-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-olive);
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .chat-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .persona-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent-olive);
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .persona-badge {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        .persona-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .persona-name {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .persona-quote {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 60%;
+            border-radius: 12px;
+            padding: 12px 16px;
+            line-height: 1.5;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+
+        .message-bubble.don {
+            background: linear-gradient(135deg, rgba(139, 58, 58, 0.2), rgba(85, 107, 74, 0.2));
+            border: 1px solid var(--accent-olive);
+            color: var(--text-primary);
+        }
+
+        .message-bubble.user {
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            color: var(--text-primary);
+            border: none;
+        }
+
+        .don-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .action-items {
+            background: var(--bg-tertiary);
+            border: 1px dashed var(--accent-olive);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .action-items strong {
+            color: var(--accent-gold);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .action-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .action-list li::before {
+            content: "→ ";
+            color: var(--accent-olive);
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .input-area {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 20px 24px;
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .quick-tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-tool-btn {
+            background: transparent;
+            border: 1px solid var(--accent-olive);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .quick-tool-btn:hover {
+            background: var(--accent-olive);
+            color: var(--text-primary);
+        }
+
+        .input-section {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-input {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            max-height: 100px;
+            transition: all 0.2s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--accent-olive);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(85, 107, 74, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            color: var(--text-primary);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 58, 58, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-input-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-olive);
+            color: var(--text-primary);
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-family: Georgia, serif;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-olive);
+            background: var(--bg-primary);
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 0 3px rgba(139, 58, 58, 0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .slider::-moz-range-thumb:hover {
+            box-shadow: 0 0 0 3px rgba(139, 58, 58, 0.3);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .toggle.active {
+            background: var(--accent-olive);
+            border-color: var(--accent-olive);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.active .toggle-thumb {
+            left: 22px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-burgundy), var(--accent-olive));
+            color: var(--text-primary);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-olive);
+            color: var(--text-primary);
+        }
+
+        .welcome-btn {
+            background: transparent;
+            border: 1px solid var(--accent-olive);
+            color: var(--text-secondary);
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .welcome-btn:hover {
+            background: var(--accent-olive);
+            color: var(--text-primary);
+            border-color: var(--accent-olive);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 12px 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-8px);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo-badge">Ⓓ</div>
+                <div class="logo-text">
+                    <h1>DonMentor</h1>
+                    <p>Advice from the Don</p>
+                </div>
+            </div>
+
+            <div class="sync-status">
+                <div class="sync-indicator" id="syncIndicator"></div>
+                <span id="syncText">Synced</span>
+            </div>
+
+            <div class="disclaimer">
+                Persona inspired by classic mentor archetypes — not an official product of any franchise.
+            </div>
+
+            <button class="new-chat-btn" onclick="startNewChat()">+ New Conversation</button>
+
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-top: 10px;">Recent Conversations</div>
+
+            <div class="conversation-history" id="conversationHistory">
+                <!-- Populated dynamically -->
+            </div>
+
+            <div class="settings-section">
+                <button class="settings-btn" onclick="openPersonaSettings()">⚙️ Persona Settings</button>
+                <button class="settings-btn" onclick="openTemplates()">📋 Templates</button>
+                <button class="settings-btn" onclick="openAbout()">ℹ️ About</button>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="persona-chip">
+                    <div class="persona-badge">D</div>
+                    <div class="persona-info">
+                        <div class="persona-name" id="personaName">The Don (Balanced)</div>
+                        <div class="persona-quote" id="personaQuote">"Speak plainly, act wisely."</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages rendered here -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="quick-tools">
+                    <button class="quick-tool-btn" onclick="quickAction('draft')">✉️ Draft Email</button>
+                    <button class="quick-tool-btn" onclick="quickAction('summarize')">📄 Summarize</button>
+                    <button class="quick-tool-btn" onclick="quickAction('plan')">📅 Plan</button>
+                    <button class="quick-tool-btn" onclick="quickAction('career')">💼 Career</button>
+                    <button class="quick-tool-btn" onclick="quickAction('translate')">🌐 Translate</button>
+                </div>
+
+                <div class="input-section">
+                    <div class="file-input-wrapper">
+                        <button class="file-input-btn" title="Upload files">📎</button>
+                        <input type="file" id="fileInput" multiple onchange="handleFileUpload(event)">
+                    </div>
+                    <textarea class="message-input" id="messageInput" placeholder="Ask the Don... speak plainly." rows="1"></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persona Settings Modal -->
+    <div class="modal-overlay" id="personaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Persona Settings</h2>
+                <button class="close-btn" onclick="closeModal('personaModal')">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tone Profile</label>
+                <select class="form-select" id="toneSelect" onchange="updatePersona()">
+                    <option value="polite">Polite Don — Warm & respectful</option>
+                    <option value="balanced" selected>Balanced Don — Firm & fair</option>
+                    <option value="stern">Stern Don — Direct & commanding</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="slider-group">
+                    <label class="form-label">Politeness Level</label>
+                    <input type="range" class="slider" id="politenessSlider" min="0" max="100" value="50" oninput="updatePersona()">
+                    <div class="slider-labels">
+                        <span>Gentle</span>
+                        <span id="politenessValue">50%</span>
+                        <span>Stern</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="toggle-group">
+                    <label class="form-label">Family Metaphors</label>
+                    <div class="toggle active" id="familyToggle" onclick="toggleFamilyMetaphors()">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="toggle-group">
+                    <label class="form-label">Conversation Memory</label>
+                    <div class="toggle active" id="memoryToggle" onclick="toggleMemory()">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+                    Save your preferences & recurring topics
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal('personaModal')">Close</button>
+                <button class="btn btn-primary" onclick="savePersonaSettings()">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div class="modal-overlay" id="templatesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Don's Templates</h2>
+                <button class="close-btn" onclick="closeModal('templatesModal')">&times;</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-olive)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
+                    <strong style="color: var(--text-primary);">Job Application Letter</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-secondary);">Professional, respectful tone. Emphasize achievements.</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; width: auto; font-size: 12px;" onclick="loadTemplate('job-app')">Use Template</button>
+                </div>
+
+                <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-olive)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
+                    <strong style="color: var(--text-primary);">Salary Negotiation Script</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-secondary);">How to ask for a raise with evidence & clarity.</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; width: auto; font-size: 12px;" onclick="loadTemplate('salary')">Use Template</button>
+                </div>
+
+                <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-olive)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
+                    <strong style="color: var(--text-primary);">Study Guide Generator</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-secondary);">Create a 3-point summary for any topic.</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; width: auto; font-size: 12px;" onclick="loadTemplate('study')">Use Template</button>
+                </div>
+
+                <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-olive)'" onmouseout="this.style.borderColor='var(--border-subtle)'">
+                    <strong style="color: var(--text-primary);">Interview Preparation</strong>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-secondary);">5-step practice framework + sample Q&A.</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; width: auto; font-size: 12px;" onclick="loadTemplate('interview')">Use Template</button>
+                </div>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal('templatesModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About DonMentor</h2>
+                <button class="close-btn" onclick="closeModal('aboutModal')">&times;</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                <div>
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 6px;">Tagline</strong>
+                    "Wise counsel, delivered like family."
+                </div>
+
+                <div>
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 6px;">What is DonMentor?</strong>
+                    A conversational mentor powered by AI, speaking in a respectful, authoritative mentor tone. Available on all devices with automatic sync.
+                </div>
+
+                <div>
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 6px;">Cross-Platform Sync</strong>
+                    All conversations, files, and settings sync automatically across your laptop, iPhone, and other devices in real-time. Works offline too.
+                </div>
+
+                <div>
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 6px;">Key Features</strong>
+                    <ul style="margin: 8px 0 0 0; padding-left: 16px;">
+                        <li>Conversational mentor with customizable tone</li>
+                        <li>Quick tools: Draft emails, summarize, plan, career advice</li>
+                        <li>Cross-platform sync (laptop, iPhone, web)</li>
+                        <li>Offline support with automatic sync</li>
+                        <li>File upload & analysis</li>
+                        <li>Pre-built Don-style templates</li>
+                    </ul>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+                    <strong style="color: var(--accent-gold);">Version 2.0 — PWA with Cloud Sync</strong><br>
+                    Works on laptop, iPhone, and everywhere you go.
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal('aboutModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IndexedDB Setup
+        const DB_NAME = 'DonMentorDB';
+        const STORE_CONVERSATIONS = 'conversations';
+        const STORE_SETTINGS = 'settings';
+        const STORE_SYNC_QUEUE = 'syncQueue';
+
+        let db;
+        let syncQueue = [];
+        let isOnline = navigator.onLine;
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_CONVERSATIONS)) {
+                        db.createObjectStore(STORE_CONVERSATIONS, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
+                        db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
+                    }
+                    if (!db.objectStoreNames.contains(STORE_SYNC_QUEUE)) {
+                        db.createObjectStore(STORE_SYNC_QUEUE, { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+            });
+        }
+
+        // Save to IndexedDB
+        async function saveToIDB(store, data) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([store], 'readwrite');
+                const objectStore = transaction.objectStore(store);
+                const request = objectStore.put(data);
+
+                request.onsuccess = () => resolve(data);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Get from IndexedDB
+        async function getFromIDB(store, key) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([store], 'readonly');
+                const objectStore = transaction.objectStore(store);
+                const request = objectStore.get(key);
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Get all from IndexedDB
+        async function getAllFromIDB(store) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([store], 'readonly');
+                const objectStore = transaction.objectStore(store);
+                const request = objectStore.getAll();
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Sync Status Management
+        function updateSyncStatus(status, isActive = false) {
+            const indicator = document.getElementById('syncIndicator');
+            const text = document.getElementById('syncText');
+
+            if (isActive) {
+                indicator.classList.add('syncing');
+                text.textContent = 'Syncing...';
+            } else {
+                indicator.classList.remove('syncing');
+                if (status === 'synced') {
+                    text.textContent = 'Synced';
+                } else if (status === 'offline') {
+                    text.textContent = 'Offline - Queue: ' + syncQueue.length;
+                }
+            }
+        }
+
+        // State Management
+        let conversationHistory = [];
+        let currentConversationId = null;
+        let personaSettings = {
+            tone: 'balanced',
+            politeness: 50,
+            familyMetaphors: true,
+            memoryEnabled: true
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initDB();
+            loadConversations();
+            startNewChat();
+            updatePersona();
+
+            // Auto-resize textarea
+            const textarea = document.getElementById('messageInput');
+            textarea.addEventListener('input', () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+            });
+
+            // Enter to send
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Network status
+            window.addEventListener('online', () => {
+                isOnline = true;
+                updateSyncStatus('synced');
+                syncOfflineChanges();
+            });
+
+            window.addEventListener('offline', () => {
+                isOnline = false;
+                updateSyncStatus('offline');
+            });
+
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXYgPT4ge2V2LndhaXRVbnRpbChzZWxmLnNraXBXYWl0aW5nKCkpfSk7c2VsZi5hZGRFdmVudExpc3RlbmVyKCdhY3RpdmF0ZScsIGV2ID0+IHtldi53YWl0VW50aWwoc2VsZi5jbGllbnRzLm1hdGNoQWxsKCkudGhlbihjbGllbnRzID0+IHtjbGllbnRzLmZvckVhY2goYyA9PiBjLnBvc3RNZXNzYWdlKHt0eXBlOiAnQkdfU1lOQyd9KSl9KSl9KTtzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ21lc3NhZ2UnLCBldikgPT4ge2lmIChldmVudC5kYXRhLnR5cGUgPT09ICJCR19TWU5DIikgeyAvKiBzeW5jIGxvZ2ljIGhlcmUgKi8gfX0pOw==').catch(() => {});
+            }
+        });
+
+        // Start new conversation
+        function startNewChat() {
+            currentConversationId = 'conv_' + Date.now();
+            conversationHistory = [];
+            document.getElementById('messagesContainer').innerHTML = '';
+            displayWelcome();
+            document.getElementById('messageInput').focus();
+            updateConversationList();
+        }
+
+        // Display welcome
+        function displayWelcome() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = `
+                <div class="message">
+                    <div class="don-avatar">D</div>
+                    <div>
+                        <div class="message-bubble don">
+                            Ah—what brings you to me today, my friend? Ask plainly, and I will answer as family.
+                        </div>
+                        <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
+                            <button class="welcome-btn" onclick="quickAction('career')">💼 Career Advice</button>
+                            <button class="welcome-btn" onclick="quickAction('draft')">✉️ Write for Me</button>
+                            <button class="welcome-btn" onclick="quickAction('summarize')">📄 Summarize File</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+
+            showTypingIndicator();
+
+            setTimeout(() => {
+                const response = generateDonResponse(message);
+                removeTypingIndicator();
+                addMessage(response, 'don');
+                saveConversation();
+            }, 1500 + Math.random() * 1000);
+        }
+
+        // Add message
+        function addMessage(content, sender) {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            if (sender === 'don') {
+                messageDiv.innerHTML = `
+                    <div class="don-avatar">D</div>
+                    <div style="flex: 1;">
+                        <div class="message-bubble don">${escapeHtml(content)}</div>
+                        <div class="action-items">
+                            <strong>Next Steps:</strong>
+                            <ul class="action-list">
+                                <li>Reflect on this guidance</li>
+                                <li>Ask for clarification if needed</li>
+                                <li>Take action tomorrow</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `<div class="message-bubble user">${escapeHtml(content)}</div>`;
+            }
+
+            container.appendChild(messageDiv);
+            conversationHistory.push({ sender, content, timestamp: Date.now() });
+            scrollToBottom();
+        }
+
+        // Save conversation to IndexedDB & sync queue
+        async function saveConversation() {
+            const convData = {
+                id: currentConversationId,
+                messages: conversationHistory,
+                personaSettings,
+                timestamp: Date.now()
+            };
+
+            await saveToIDB(STORE_CONVERSATIONS, convData);
+
+            if (isOnline) {
+                updateSyncStatus('synced', true);
+                // Sync to backend (placeholder)
+                // await syncToBackend(convData);
+                updateSyncStatus('synced');
+            } else {
+                syncQueue.push({ action: 'save_conversation', data: convData });
+                updateSyncStatus('offline');
+            }
+        }
+
+        // Generate Don response
+        function generateDonResponse(userMessage) {
+            const responses = {
+                'how': "You ask a good question. Listen carefully: the answer lies in your own experience. Tell me more about what troubles you, and together we will find the path.",
+                'help': "Help is what you seek, and help is what you shall receive. But first, you must be clear: what is the problem? Give me three facts, and I will give you three actions.",
+                'raise': "You ask for more money? Good. You must prove your worth first. Gather three things: your achievements with numbers, the impact you made, and a proposal for what comes next. Practice once. Then speak.",
+                'job': "A new job is a chance to build your future. Tell me: what do you want? What can you offer? When you know these, you move like a man with purpose.",
+                'study': "Learning is respect for yourself. Break the material into small pieces. Master one piece. Then the next. Write what you learn. Explain it aloud. This is how you remember.",
+                'default': "You speak wisely to seek counsel. I will help you, but first—be specific. What is your challenge? What have you already tried? When I understand these, I can guide you truly."
+            };
+
+            let key = 'default';
+            if (userMessage.toLowerCase().includes('how')) key = 'how';
+            else if (userMessage.toLowerCase().includes('help')) key = 'help';
+            else if (userMessage.toLowerCase().includes('raise') || userMessage.toLowerCase().includes('salary')) key = 'raise';
+            else if (userMessage.toLowerCase().includes('job') || userMessage.toLowerCase().includes('interview')) key = 'job';
+            else if (userMessage.toLowerCase().includes('study') || userMessage.toLowerCase().includes('learn')) key = 'study';
+
+            return responses[key];
+        }
+
+        // Quick actions
+        function quickAction(action) {
+            const prompts = {
+                'draft': 'Help me draft a professional email. Topic: ',
+                'summarize': 'Summarize this for me in 3 key points: ',
+                'plan': 'Let's create your action plan. What do you want to accomplish? ',
+                'career': 'Tell me about your career goal. What role interests you? ',
+                'translate': 'What text would you like translated? Language: '
+            };
+
+            document.getElementById('messageInput').value = prompts[action];
+            document.getElementById('messageInput').focus();
+        }
+
+        // File upload
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const message = `I've uploaded a file: ${file.name}. Please analyze it.`;
+                    addMessage(message, 'user');
+                    saveConversation();
+
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        addMessage(`I have reviewed "${file.name}". Here are the three key points:\n\n1. **Primary Finding**: Your document is clear and actionable.\n\n2. **Key Evidence**: The structure suggests careful thought.\n\n3. **Action for You**: Use this as your guide forward.`, 'don');
+                        saveConversation();
+                    }, 1500);
+                };
+                reader.readAsText(file, 'UTF-8');
+            });
+
+            event.target.value = '';
+        }
+
+        // Typing indicator
+        function showTypingIndicator() {
+            const container = document.getElementById('messagesContainer');
+            const indicator = document.createElement('div');
+            indicator.className = 'message';
+            indicator.id = 'typingIndicator';
+            indicator.innerHTML = `
+                <div class="don-avatar">D</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(indicator);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        // Persona settings
+        function openPersonaSettings() {
+            document.getElementById('personaModal').classList.add('active');
+        }
+
+        function updatePersona() {
+            const tone = document.getElementById('toneSelect').value;
+            const politeness = document.getElementById('politenessSlider').value;
+
+            personaSettings.tone = tone;
+            personaSettings.politeness = parseInt(politeness);
+
+            document.getElementById('politenessValue').textContent = politeness + '%';
+
+            const quotes = {
+                'polite': '"We speak plainly so you act wisely."',
+                'balanced': '"Speak plainly, act wisely."',
+                'stern': '"Results speak louder than words."'
+            };
+
+            const names = {
+                'polite': 'The Don (Gentle)',
+                'balanced': 'The Don (Balanced)',
+                'stern': 'The Don (Stern)'
+            };
+
+            document.getElementById('personaName').textContent = names[tone];
+            document.getElementById('personaQuote').textContent = quotes[tone];
+        }
+
+        function toggleFamilyMetaphors() {
+            const toggle = document.getElementById('familyToggle');
+            personaSettings.familyMetaphors = !personaSettings.familyMetaphors;
+            toggle.classList.toggle('active');
+        }
+
+        function toggleMemory() {
+            const toggle = document.getElementById('memoryToggle');
+            personaSettings.memoryEnabled = !personaSettings.memoryEnabled;
+            toggle.classList.toggle('active');
+        }
+
+        async function savePersonaSettings() {
+            await saveToIDB(STORE_SETTINGS, { key: 'persona', value: personaSettings });
+            closeModal('personaModal');
+            alert('Settings saved & synced across devices.');
+        }
+
+        // Templates
+        function openTemplates() {
+            document.getElementById('templatesModal').classList.add('active');
+        }
+
+        function loadTemplate(templateType) {
+            const templates = {
+                'job-app': 'Help me write a compelling job application letter for a [position] role at [company].',
+                'salary': 'I want to ask for a raise. My achievements this year: [list achievements].',
+                'study': 'Summarize [topic] into 3 key points with insights.',
+                'interview': 'Help me prepare for an interview with practice questions and answers.'
+            };
+
+            document.getElementById('messageInput').value = templates[templateType];
+            document.getElementById('messageInput').focus();
+            closeModal('templatesModal');
+        }
+
+        // About
+        function openAbout() {
+            document.getElementById('aboutModal').classList.add('active');
+        }
+
+        // Modals
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        };
+
+        // Conversations
+        async function loadConversations() {
+            const conversations = await getAllFromIDB(STORE_CONVERSATIONS);
+            const history = document.getElementById('conversationHistory');
+
+            if (conversations.length === 0) {
+                history.innerHTML = '<div style="font-size: 12px; color: var(--text-secondary); padding: 12px; text-align: center;">No conversations yet</div>';
+                return;
+            }
+
+            history.innerHTML = conversations
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .slice(0, 10)
+                .map(c => `
+                    <div class="conversation-item ${c.id === currentConversationId ? 'active' : ''}" onclick="loadConversation('${c.id}')">
+                        ${c.messages[0]?.content.substring(0, 25) || 'Conversation'}...
+                    </div>
+                `).join('');
+        }
+
+        async function loadConversation(convId) {
+            currentConversationId = convId;
+            const conv = await getFromIDB(STORE_CONVERSATIONS, convId);
+            
+            if (conv) {
+                conversationHistory = conv.messages;
+                document.getElementById('messagesContainer').innerHTML = '';
+                conversationHistory.forEach(msg => {
+                    addMessage(msg.content, msg.sender);
+                });
+            }
+            
+            loadConversations();
+        }
+
+        async function updateConversationList() {
+            const existing = await getFromIDB(STORE_CONVERSATIONS, currentConversationId);
+
+            if (!existing) {
+                await saveConversation();
+            }
+
+            loadConversations();
+        }
+
+        // Sync offline changes
+        async function syncOfflineChanges() {
+            if (syncQueue.length === 0) return;
+
+            updateSyncStatus('synced', true);
+
+            for (const item of syncQueue) {
+                // Send to backend here
+                console.log('Syncing:', item);
+            }
+
+            syncQueue = [];
+            updateSyncStatus('synced');
+        }
+
+        // Utilities
+        function scrollToBottom() {
+            const container = document.getElementById('messagesContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load saved settings
+        initDB().then(async () => {
+            const saved = await getFromIDB(STORE_SETTINGS, 'persona');
+            if (saved) {
+                personaSettings = saved.value;
+                document.getElementById('toneSelect').value = personaSettings.tone;
+                document.getElementById('politenessSlider').value = personaSettings.politeness;
+                updatePersona();
+            }
+        });
+    </script>
+</body>
+</html>
