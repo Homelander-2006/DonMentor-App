@@ -1504,16 +1504,21 @@
             }
         });
 
-                // Ensure send button works (backup event listener)
-        document.addEventListener('DOMContentLoaded', function() {
+                // Fix: Ensure send button works
+        (function() {
             const sendBtn = document.getElementById('sendBtn');
             if (sendBtn) {
+                console.log('DonMentor: Attaching click handler to send button');
                 sendBtn.addEventListener('click', function(e) {
+                    console.log('DonMentor: Send button clicked!');
                     e.preventDefault();
                     sendMessage();
                 });
+            } else {
+                console.error('DonMentor: Send button not found!');
             }
-        });
+        })();
+        
     </script>
 </body>
 </html>
